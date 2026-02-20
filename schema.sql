@@ -1,0 +1,23 @@
+-- Create Database
+CREATE DATABASE IF NOT EXISTS kodbank_db;
+USE kodbank_db;
+
+-- Create koduser table
+CREATE TABLE IF NOT EXISTS koduser (
+    uid BIGINT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    balance DECIMAL(15, 2) NOT NULL DEFAULT 100000.00,
+    phone VARCHAR(20),
+    role ENUM('CUSTOMER', 'MANAGER', 'ADMIN') NOT NULL DEFAULT 'CUSTOMER'
+);
+
+-- Create user_token table
+CREATE TABLE IF NOT EXISTS user_token (
+    tid BIGINT AUTO_INCREMENT PRIMARY KEY,
+    token VARCHAR(512) NOT NULL,
+    uid BIGINT NOT NULL,
+    expiry DATETIME NOT NULL,
+    FOREIGN KEY (uid) REFERENCES koduser(uid) ON DELETE CASCADE
+);

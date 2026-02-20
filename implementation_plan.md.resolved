@@ -1,0 +1,65 @@
+# Kodbank Full-Stack Web Application Plan
+
+This document outlines the architecture and implementation steps for building the Kodbank application, a full-stack web application featuring user authentication, balance checking, and a dashboard.
+
+## User Review Required
+> [!IMPORTANT]
+> Please review this plan to ensure it meets your requirements before I begin the execution phase.
+> - Do you have any specific preferences for the Spring Boot and React versions?
+> - Where would you like me to store the generated SQL schema and documentation files? (e.g., in a `docs/` or `sql/` folder in the root directory)
+
+## Proposed Architecture
+
+- **Backend**: Java Spring Boot with Spring Security and Spring Data JPA.
+- **Database**: MySQL.
+- **Frontend**: React (using Vite) with Tailwind CSS for modern styling.
+- **Authentication**: JWT (JSON Web Tokens) with a signature key, stored in cookies (HTTP-only).
+
+## Proposed Changes
+
+### Backend (Spring Boot) `c:\banking project\backend`
+
+#### [NEW] Database Entities
+- `Koduser`: `uid` (PK), `username` (unique), `email` (unique), `password` (hashed), `balance` (default 100000), `phone`, `role` (CUSTOMER, MANAGER, ADMIN).
+- `UserToken`: `tid` (PK), `token` (JWT), `user` (FK to `Koduser`), `expiry` (timestamp).
+
+#### [NEW] Security Layer
+- Custom JWT Authentication Filter to validate requests.
+- Spring Security configuration to secure `/api/balance` and expose `/api/auth/**`.
+- Password encoding using `BCryptPasswordEncoder`.
+- CORS configuration to allow requests from the React frontend.
+
+#### [NEW] API Endpoints
+- `POST /api/auth/register`: Register user, hash password, set default balance.
+- `POST /api/auth/login`: Authenticate user, generate JWT, save token, return HTTP-only cookie.
+- `GET /api/balance`: Secured. Fetch balance.
+- `POST /api/auth/logout`: Invalidate token / clear cookie.
+
+#### [NEW] Exception Handling & Swagger
+- `@ControllerAdvice` for global exception handling.
+- Annotations for input validation (e.g. `@NotBlank`, `@Email`).
+- Setup SpringDoc OpenAPI for API documentation UI.
+
+### Frontend (React) `c:\banking project\frontend`
+
+#### [NEW] Application Pages
+- **Register Page**: Form for registration with validation.
+- **Login Page**: Form for login handling credentials and storing auth state.
+- **Dashboard Page**: Protected route displaying user's balance and role, with a modern "party popper" style animation and a logout button.
+
+### Documentation & Setup `c:\banking project`
+
+#### [NEW] Files
+- `schema.sql`: Database schema creation script.
+- `README.md`: Setup instructions and `.env` configuration guide.
+- `api-docs.md`: Markdown API documentation.
+
+## Verification Plan
+
+### Automated/Manual Testing
+- Start the MySQL database and run `schema.sql`.
+- Start the Spring Boot backend (`mvn spring-boot:run`).
+- Start the React frontend (`npm run dev`).
+- Complete the full user flow manually in the browser: Register -> Login -> Dashboard -> Logout.
+- Verify JWT acts appropriately as an HTTP-only cookie and the balance is securely fetched.
+- Verify the MySQL database accurately maintains state.
