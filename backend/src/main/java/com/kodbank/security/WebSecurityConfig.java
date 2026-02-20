@@ -62,26 +62,25 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http.csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .exceptionHandling(exception ->
-                        exception.authenticationEntryPoint(unauthorizedHandler))
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .exceptionHandling(exception ->
+                    exception.authenticationEntryPoint(unauthorizedHandler))
+            .sessionManagement(session ->
+                    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
 
-                        // ✅ Public Endpoints
-                        .requestMatchers(
-                                "/api/auth/**",
-                                "/api/register",
-                                "/api/login",
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html"
-                        ).permitAll()
+                    // ✅ Public Endpoints
+                    .requestMatchers(
+                            "/api/auth/**",
+                            "/healthz",
+                            "/v3/api-docs/**",
+                            "/swagger-ui/**",
+                            "/swagger-ui.html"
+                    ).permitAll()
 
-                        // 🔐 All Other Endpoints Require Authentication
-                        .anyRequest().authenticated()
-                );
+                    // 🔐 All Other Endpoints Require Authentication
+                    .anyRequest().authenticated()
+            );
 
         http.authenticationProvider(authenticationProvider());
 
@@ -93,10 +92,14 @@ public class WebSecurityConfig {
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
+
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-                List.of("http://localhost:5173", "http://localhost:3000")
+                List.of(
+                        "http://localhost:5173",
+                        "http://localhost:3000"
+                )
         );
 
         configuration.setAllowedMethods(
